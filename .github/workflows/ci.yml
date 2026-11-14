@@ -1,0 +1,45 @@
+name: Build and test
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  core:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Eigen
+        run: sudo apt-get update && sudo apt-get install -y libeigen3-dev
+      - name: Build and test core without ROS
+        run: |
+          cmake -S st3821671 -B build/core -DBUILD_ROS2=OFF -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/core --parallel 2
+          ctest --test-dir build/core --output-on-failure
+  ros:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: [humble, jazzy]
+    container: ros:${{ matrix.distro }}-ros-base
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build and runtime dependencies
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install -y python3-colcon-common-extensions libeigen3-dev ros-${ROS_DISTRO}-rviz2 ros-${ROS_DISTRO}-eigen3-cmake-module
+      - name: Build ROS package
+        shell: bash
+        run: |
+          source /opt/ros/$ROS_DISTRO/setup.bash
+          colcon build --packages-select st3821671 --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON --event-handlers console_direct+
+      - name: Run core tests and ROS smoke test
+        shell: bash
+        run: |
+          source /opt/ros/$ROS_DISTRO/setup.bash
+          source install/setup.bash
+          colcon test --packages-select st3821671 --event-handlers console_direct+
+          colcon test-result --verbose
+          python3 scripts/ros_smoke_test.py

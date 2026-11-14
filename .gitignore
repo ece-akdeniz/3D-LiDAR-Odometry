@@ -1,0 +1,15 @@
+.DS_Store
+build/
+install/
+log/
+__pycache__/
+*.pyc
+.venv/
+data/
+datasets/
+*.bag
+*.db3
+*.mcap
+estimate*.txt
+*.tum
+*.pdf

@@ -1,0 +1,54 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Global Options:
+    Fixed Frame: odom
+    Frame Rate: 20
+    Background Color: 30; 30; 30
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 1
+      Plane Cell Count: 30
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Enabled: true
+      Show Names: true
+    - Class: rviz_default_plugins/PointCloud2
+      Name: LiDAR
+      Enabled: true
+      Topic:
+        Value: /points
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Depth: 2
+      Size (m): 0.03
+      Style: Points
+      Color Transformer: AxisColor
+      Position Transformer: XYZ
+      Decay Time: 0
+    - Class: rviz_default_plugins/Path
+      Name: Trajectory
+      Enabled: true
+      Topic:
+        Value: /trajectory
+        Reliability Policy: Reliable
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Depth: 1
+      Color: 60; 210; 170
+      Line Style: Lines
+      Line Width: 0.03
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 18
+      Pitch: 0.6
+      Yaw: 0.8
+Window Geometry:
+  Width: 1200
+  Height: 800

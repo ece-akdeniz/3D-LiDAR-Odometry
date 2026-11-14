@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>st3821671</name>
+  <version>0.1.0</version>
+  <description>Eigen-only robust ICP core with a ROS 2 3D LiDAR odometry node.</description>
+  <maintainer email="ece-akdeniz@users.noreply.github.com">Ece Akdeniz</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <build_depend>eigen3_cmake_module</build_depend>
+  <depend>eigen</depend>
+  <depend>rclcpp</depend>
+  <depend>rcl_interfaces</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>tf2_ros</depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <test_depend>rclpy</test_depend>
+  <test_depend>ros2launch</test_depend>
+  <test_depend>python3-pytest</test_depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

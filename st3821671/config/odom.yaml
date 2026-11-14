@@ -1,0 +1,28 @@
+lidar_odometry:
+  ros__parameters:
+    points_topic: /points
+    odom_frame: odom
+    min_range: 0.5
+    max_range: 80.0
+    intensity_threshold: 0.0
+    max_input_points: 200000
+    voxel_size: 0.15
+    max_scan_points: 12000
+    max_correspondence_distance: 0.8
+    huber_delta: 0.15
+    trim_fraction: 0.85
+    min_overlap: 0.3
+    max_rmse: 0.3
+    max_iterations: 40
+    min_correspondences: 30
+    translation_epsilon: 0.0001
+    rotation_epsilon: 0.0001
+    max_translation_step: 1.0
+    max_rotation_step: 0.6
+    keyframe_translation: 0.3
+    keyframe_rotation: 0.15
+    max_keyframes: 12
+    max_map_points: 60000
+    max_path_poses: 5000
+    save_trajectory: true
+    trajectory_path: ./estimate.txt
