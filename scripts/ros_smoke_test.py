@@ -30,6 +30,25 @@ def spin_until(node, predicate, timeout=15.0):
     raise AssertionError("Timed out waiting for ROS output")
 
 
+def publish_until_received(node, publisher, msg, predicate, timeout=15.0):
+    """Best-effort input can lose its first sample during DDS discovery.
+
+    Retransmit the same stamped scan until the reliable output arrives. The node
+    drops duplicate stamps, so retries cannot add duplicate trajectory entries.
+    """
+    end = time.monotonic() + timeout
+    next_send = 0.0
+    while time.monotonic() < end:
+        now = time.monotonic()
+        if now >= next_send:
+            publisher.publish(msg)
+            next_send = now + 0.3
+        rclpy.spin_once(node, timeout_sec=0.05)
+        if predicate():
+            return
+    raise AssertionError(f"Timed out receiving pose/TF for scan {msg.header.stamp.sec}")
+
+
 def main():
     rclpy.init()
     node = rclpy.create_node("odometry_smoke_test")
@@ -73,9 +92,9 @@ def main():
                     msg.point_step, msg.row_step = 16, len(points) * 16
                     msg.data = b"".join(struct.pack("<ffff", *p) for p in points)
                     msg.is_bigendian = False
-                    publisher.publish(msg)
                     stamp = key(msg.header.stamp)
-                    spin_until(node, lambda: stamp in received and stamp in transforms)
+                    publish_until_received(node, publisher, msg,
+                                           lambda: stamp in received and stamp in transforms)
                     odom, tf = received[stamp], transforms[stamp]
                     assert odom.header.frame_id == "odom"
                     assert odom.child_frame_id == tf.child_frame_id == "synthetic_lidar"
@@ -101,7 +120,8 @@ def main():
                 print(log.read_text())
                 raise
             finally:
-                os.killpg(process.pid, signal.SIGINT)
+                if process.poll() is None:
+                    os.killpg(process.pid, signal.SIGINT)
                 try:
                     process.wait(timeout=10)
                 except subprocess.TimeoutExpired:
