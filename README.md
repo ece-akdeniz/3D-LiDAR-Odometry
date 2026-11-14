@@ -4,12 +4,11 @@ C++17 / ROS 2 LiDAR odometry for the University of Stuttgart Advanced Mobile
 Robotics project. The package subscribes to `sensor_msgs/PointCloud2`, estimates
 the sensor's 6DoF pose, and publishes `odom <- cloud_frame` through TF2.
 
-**Status:** implemented and covered by deterministic synthetic tests. The three
-course datasets are currently unavailable, so real-data accuracy, robustness,
-and runtime have **not** been established. This is a working baseline to evaluate
-and tune when the bags become available, not a claim that the course pass criteria
-have been met. CI builds the ROS wrapper on Humble and Jazzy and runs a synthetic
-end-to-end smoke test.
+The implementation uses robust ICP against a bounded local map, with an
+Eigen-only core and a ROS 2 adapter for messages, TF and trajectory output.
+Deterministic tests cover registration, tracking and input decoding. CI builds
+the ROS wrapper on Humble and Jazzy and runs a synthetic end-to-end smoke test.
+Dataset files are excluded from version control.
 
 ## Build
 
@@ -127,7 +126,7 @@ consecutive recorded scans. Slower replay helps when processing cannot keep up;
 the subscription has a short best-effort queue to avoid accumulating stale scans.
 
 Limitations: no IMU fusion, scan deskewing, motion prediction, loop closure,
-global relocalization, or ground-truth evaluation yet. Fast motion, repeated
+global relocalization, or built-in ground-truth evaluation. Fast motion, repeated
 geometry, moving objects, corridors and low overlap can cause drift or tracking
 loss. Point-to-point correspondence rank checks cannot detect every environmental
 ambiguity. Holding the last pose limits individual failures but does not prove a
@@ -160,14 +159,16 @@ layouts. The ROS smoke test launches the installed package with a remapped input
 publishes 20 synthetic scans, and checks pose accuracy, TF direction, path length,
 quaternion normalization and TUM output.
 
-## When the course bags are available
+## Dataset evaluation
 
-Keep them outside Git (`data/` and bag extensions are ignored). For each of the
-three bags, inspect the fields and topic, run at a rate your machine can sustain,
+Keep dataset files outside Git (`data/` and bag extensions are ignored). The
+course evaluation sequences cover one room, one floor, and three floors. For
+each bag, inspect the fields and topic, run at a rate your machine can sustain,
 check that TF follows the sensor frame, inspect the trajectory in RViz, and record
 rejections, discontinuities, processing time and final drift. Compare against
 ground truth if supplied. Tune on the room sequence first, then verify the floor
-and three-floor sequences without silently claiming results from synthetic tests.
+and three-floor sequences. Report measured accuracy and runtime separately from
+the synthetic test suite.
 
 The lecture PDF and course datasets are excluded from this public repository.
 This source is MIT licensed; that license does not cover course materials or data.
